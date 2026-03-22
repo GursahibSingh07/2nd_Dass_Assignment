@@ -15,7 +15,7 @@
 
 ### cards.py
 - Added module docstring (line 1)
-- Fixed `line-too-long` issues (lines 4–30)
+- Fixed `line-too-long` issues (lines 4-30)
 
 ### property.py
 - Added module docustring (line 1)
