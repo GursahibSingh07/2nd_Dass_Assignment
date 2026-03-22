@@ -104,6 +104,10 @@ class MissionPlanningModule:
         if mission.status != "ready":
             raise MissionPlanningError("Only ready missions can be started.")
 
+        for member_name in mission.assigned_members:
+            if not self._registration.is_registered(member_name):
+                raise MissionPlanningError(f"Crew member '{member_name}' is no longer registered.")
+
         if "mechanic" in {role.casefold() for role in mission.required_roles} and not self._has_available_mechanic(mission):
             raise MissionPlanningError("Missions requiring mechanic cannot start without an available mechanic.")
 
@@ -165,9 +169,15 @@ class MissionPlanningModule:
         return tuple(normalized)
 
     def _has_available_mechanic(self, mission: Mission) -> bool:
+        has_mechanic = False
         for member_name in mission.assigned_members:
             if self._crew_management.get_role(member_name).casefold() == "mechanic":
-                return True
+                has_mechanic = True
+                break
+        if not has_mechanic:
+            return False
+        if mission.mission_type.casefold() in {"repair", "repair_support", "maintenance"}:
+            return True
         for car in self._inventory.list_cars():
             if car.status == "damaged":
                 return False

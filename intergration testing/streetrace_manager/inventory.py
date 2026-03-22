@@ -53,6 +53,8 @@ class InventoryModule:
         existing = self._cars.get(key)
         if existing is None:
             raise InventoryError(f"Car '{car_id.strip()}' does not exist.")
+        if existing.status == "damaged" and cleaned_status == "ready":
+            raise InventoryError("Damaged cars must complete maintenance before becoming ready.")
 
         updated = Car(car_id=existing.car_id, model=existing.model, status=cleaned_status)
         self._cars[key] = updated

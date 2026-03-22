@@ -54,7 +54,10 @@ class RaceManagementModule:
         if not self._registration.is_registered(cleaned_driver):
             raise RaceManagementError(f"Crew member '{cleaned_driver}' is not registered.")
 
+        registered_role = self._registration.get_member(cleaned_driver).role
         role = self._crew_management.get_role(cleaned_driver)
+        if registered_role.casefold() != role.casefold():
+            raise RaceManagementError(f"Crew member '{cleaned_driver}' has conflicting role assignments.")
         if role.casefold() != "driver":
             raise RaceManagementError(f"Crew member '{cleaned_driver}' is not a driver.")
 

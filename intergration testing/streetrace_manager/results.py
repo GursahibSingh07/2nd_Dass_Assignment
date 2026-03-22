@@ -54,6 +54,8 @@ class ResultsModule:
         race = self._race_management.get_race(cleaned_race_id)
         if race.status != "completed":
             raise ResultsError(f"Race '{race.race_id}' is not completed.")
+        if not self._registration.is_registered(race.driver_name):
+            raise ResultsError(f"Crew member '{race.driver_name}' is not registered.")
 
         points = self._calculate_points(position)
 
@@ -76,6 +78,32 @@ class ResultsModule:
             car_damaged=car_damaged,
         )
         self._results[race_key] = result
+        return result
+
+    def remove_result(self, race_id: str) -> RaceResult:
+        key = self._normalize_race_key(race_id)
+        result = self._results.get(key)
+        if result is None:
+            raise ResultsError(f"Result for race '{race_id.strip()}' does not exist.")
+
+        driver_key = result.driver_name.casefold()
+        updated_points = self._rankings.get(driver_key, 0) - result.points_awarded
+        if updated_points > 0:
+            self._rankings[driver_key] = updated_points
+        else:
+            self._rankings.pop(driver_key, None)
+            self._display_names.pop(driver_key, None)
+
+        if result.prize_money > 0:
+            self._inventory.spend_cash(result.prize_money)
+
+        if result.car_damaged:
+            car = self._inventory.get_car(result.car_id)
+            if car.status == "damaged":
+                self._inventory.set_car_status(result.car_id, "maintenance")
+                self._inventory.set_car_status(result.car_id, "ready")
+
+        del self._results[key]
         return result
 
     def get_result(self, race_id: str) -> RaceResult:

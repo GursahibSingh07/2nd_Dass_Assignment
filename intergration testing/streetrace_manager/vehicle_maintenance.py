@@ -103,6 +103,9 @@ class VehicleMaintenanceModule:
             if quantity > available:
                 raise VehicleMaintenanceError(f"Insufficient tool quantity for '{tool_name}'.")
 
+        if job.labor_cost > self._inventory.get_cash_balance():
+            raise VehicleMaintenanceError("Insufficient cash balance for labor cost.")
+
         for part_name, quantity in job.required_parts:
             self._inventory.consume_spare_part(part_name, quantity)
 
@@ -178,7 +181,7 @@ class VehicleMaintenanceModule:
                 raise VehicleMaintenanceError(f"{item_type} quantity must be a positive integer.")
             key = cleaned_name.casefold()
             if key in seen:
-                continue
+                raise VehicleMaintenanceError(f"Duplicate {item_type.lower()} requirement for '{cleaned_name}'.")
             normalized.append((cleaned_name, quantity))
             seen.add(key)
         return tuple(normalized)

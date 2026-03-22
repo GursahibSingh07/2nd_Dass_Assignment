@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .registration import RegistrationModule
+from .registration import CrewMember, RegistrationModule
 
 
 @dataclass(frozen=True)
@@ -31,7 +31,17 @@ class CrewManagementModule:
         if not cleaned_role:
             raise CrewManagementError("Role is required.")
 
+        registered_member = self._registration.get_member(member_name)
+        previous_assigned = self._roles.get(key)
         self._roles[key] = cleaned_role
+
+        if (
+            previous_assigned is not None
+            and previous_assigned.casefold() == registered_member.role.casefold()
+            and cleaned_role.casefold() != registered_member.role.casefold()
+        ):
+            self._registration._members[key] = CrewMember(name=registered_member.name, role=cleaned_role)
+
         return cleaned_role
 
     def get_role(self, member_name: str) -> str:
