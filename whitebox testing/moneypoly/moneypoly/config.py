@@ -1,0 +1,26 @@
+"""Configuration constants for the MoneyPoly game.
+
+This module defines all fixed game parameters, these 
+values are intended to be treated as constants and used 
+throughout the codebase to ensure consistent game rules 
+and behavior.
+"""
+
+
+STARTING_BALANCE = 1500
+GO_SALARY = 200
+BOARD_SIZE = 40
+
+JAIL_POSITION = 10
+GO_TO_JAIL_POSITION = 30
+FREE_PARKING_POSITION = 20
+INCOME_TAX_POSITION = 4
+LUXURY_TAX_POSITION = 38
+
+INCOME_TAX_AMOUNT = 200
+LUXURY_TAX_AMOUNT = 75
+JAIL_FINE = 50
+
+MAX_TURNS = 100
+AUCTION_MIN_INCREMENT = 10
+BANK_STARTING_FUNDS = 20580
