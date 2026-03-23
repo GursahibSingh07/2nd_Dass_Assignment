@@ -8,7 +8,7 @@ from moneypoly.cards import CardDeck
 from moneypoly.dice import Dice
 from moneypoly.game import Game
 from moneypoly.player import Player
-from moneypoly.property import Property, PropertyGroup
+from moneypoly.property import Property, PropertyGroup, PropertyTerms
 from moneypoly import ui
 
 
@@ -95,7 +95,7 @@ def test_player_and_property_group_remaining_paths():
     p.move(2)
     assert p.position == 2
 
-    prop = Property("One", 1, 100, 10)
+    prop = Property("One", 1, PropertyTerms(100, 10))
     p.add_property(prop)
     p.add_property(prop)
     assert p.count_properties() == 1
@@ -107,11 +107,11 @@ def test_player_and_property_group_remaining_paths():
     _ = repr(p)
 
     g = PropertyGroup("G", "c")
-    p1 = Property("P1", 1, 100, 10, g)
-    p2 = Property("P2", 2, 100, 10, g)
+    p1 = Property("P1", 1, PropertyTerms(100, 10), g)
+    p2 = Property("P2", 2, PropertyTerms(100, 10), g)
 
     g.add_property(p1)
-    p3 = Property("P3", 3, 120, 12)
+    p3 = Property("P3", 3, PropertyTerms(120, 12))
     g.add_property(p3)
 
     p1.owner = p
@@ -184,7 +184,7 @@ def test_game_remaining_branches(monkeypatch):
     monkeypatch.setattr(g.board, "get_property_at", lambda pos: None)
     g._move_and_resolve(p, 1)
 
-    rr = Property("RR", 5, 200, 25)
+    rr = Property("RR", 5, PropertyTerms(200, 25))
     monkeypatch.setattr(g.board, "get_property_at", lambda pos: rr)
     g._move_and_resolve(p, 1)
 
@@ -192,7 +192,7 @@ def test_game_remaining_branches(monkeypatch):
     monkeypatch.setattr(g.board, "get_property_at", lambda pos: None)
     g._move_and_resolve(p, 1)
 
-    monkeypatch.setattr(g.board, "get_property_at", lambda pos: Property("P", 1, 100, 10))
+    monkeypatch.setattr(g.board, "get_property_at", lambda pos: Property("P", 1, PropertyTerms(100, 10)))
     g._move_and_resolve(p, 1)
 
     monkeypatch.setattr(g.board, "get_tile_type", lambda pos: "blank")
@@ -203,7 +203,7 @@ def test_game_remaining_branches(monkeypatch):
     monkeypatch.setattr(g, "_handle_property_tile", Game._handle_property_tile.__get__(g, Game))
     monkeypatch.setattr(g, "_apply_card", Game._apply_card.__get__(g, Game))
 
-    prop = Property("Own", 1, 100, 10)
+    prop = Property("Own", 1, PropertyTerms(100, 10))
     prop.owner = p
     g._handle_property_tile(p, prop)
 
@@ -213,7 +213,7 @@ def test_game_remaining_branches(monkeypatch):
     g._handle_property_tile(p, prop)
     assert pay_called["v"] == 1
 
-    prop2 = Property("U", 2, 100, 10)
+    prop2 = Property("U", 2, PropertyTerms(100, 10))
     prop2.owner = p
     assert g.unmortgage_property(p, prop2) is False
 
@@ -221,7 +221,7 @@ def test_game_remaining_branches(monkeypatch):
     g.players[1].balance = 10
     seq = iter([100, 0])
     monkeypatch.setattr("moneypoly.ui.safe_int_input", lambda prompt, default=0: next(seq))
-    g.auction_property(Property("AUC", 3, 100, 10))
+    g.auction_property(Property("AUC", 3, PropertyTerms(100, 10)))
 
     p.in_jail = True
     p.get_out_of_jail_cards = 1
@@ -248,7 +248,7 @@ def test_game_remaining_branches(monkeypatch):
     g._apply_card(p, {"description": "x", "action": "collect_from_all", "value": 10})
     g._apply_card(p, {"description": "noop", "action": "unknown", "value": 0})
 
-    target = Property("Target", 8, 120, 8)
+    target = Property("Target", 8, PropertyTerms(120, 8))
     called_tile = {"n": 0}
     monkeypatch.setattr(g.board, "get_tile_type", lambda pos: "property")
     monkeypatch.setattr(g.board, "get_property_at", lambda pos: target)
@@ -303,7 +303,7 @@ def test_game_run_and_menu_specific_branches(monkeypatch):
     monkeypatch.setattr("moneypoly.ui.safe_int_input", lambda prompt, default=0: next(seq))
     g.interactive_menu(p)
 
-    prop_m = Property("M", 1, 100, 10)
+    prop_m = Property("M", 1, PropertyTerms(100, 10))
     prop_m.owner = p
     prop_m.is_mortgaged = False
     p.properties = [prop_m]
@@ -314,7 +314,7 @@ def test_game_run_and_menu_specific_branches(monkeypatch):
     g._menu_mortgage(p)
     assert called_m["n"] == 1
 
-    prop_u = Property("U", 2, 100, 10)
+    prop_u = Property("U", 2, PropertyTerms(100, 10))
     prop_u.owner = p
     prop_u.is_mortgaged = True
     p.properties = [prop_u]
@@ -327,7 +327,7 @@ def test_game_run_and_menu_specific_branches(monkeypatch):
 
     partner = Player("P2")
     g.players = [p, partner]
-    prop_t = Property("T", 3, 100, 10)
+    prop_t = Property("T", 3, PropertyTerms(100, 10))
     prop_t.owner = p
     p.properties = [prop_t]
     seq = iter([1, 1, 25])

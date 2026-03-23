@@ -5,7 +5,7 @@ from moneypoly.board import Board
 from moneypoly.cards import CardDeck
 from moneypoly.dice import Dice
 from moneypoly.player import Player
-from moneypoly.property import Property, PropertyGroup
+from moneypoly.property import Property, PropertyGroup, PropertyTerms
 
 
 def test_player_add_and_deduct_validations():
@@ -39,7 +39,7 @@ def test_player_move_wraps_and_awards_go_on_zero():
 
 
 def test_property_mortgage_unmortgage_cycle():
-    prop = Property("X", 1, 200, 20)
+    prop = Property("X", 1, PropertyTerms(200, 20))
     first = prop.mortgage()
     second = prop.mortgage()
     assert first == 100
@@ -54,8 +54,8 @@ def test_property_group_all_owned_by_requires_full_group_ownership():
     group = PropertyGroup("G", "c")
     p1 = Player("P1")
     p2 = Player("P2")
-    a = Property("A", 1, 100, 10, group)
-    b = Property("B", 3, 100, 10, group)
+    a = Property("A", 1, PropertyTerms(100, 10), group)
+    b = Property("B", 3, PropertyTerms(100, 10), group)
 
     a.owner = p1
     b.owner = p2

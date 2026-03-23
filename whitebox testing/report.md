@@ -55,3 +55,25 @@
 ---
 
 
+## Iteration 2 :
+
+### property.py
+- Refactored the constructor to use a `PropertyTerms` dataclass instead of passing raw `price` and `base_rent` values  
+- Replaced direct instance attributes (`owner`, `is_mortgaged`, `houses`) with an internal `_state` dictionary and property accessors to reduce attribute count  
+- Added missing docstrings for ownership, mortgage, and house-related accessors  
+- Removed the previous `too-many-instance-attributes` and `too-many-arguments` pylint suppressions after refactoring  
+
+### board.py
+- Updated all `Property(...)` calls to match the new `PropertyTerms(price, rent)` structure  
+- Adjusted imports to include `PropertyTerms`  
+
+### game.py
+- Moved turn-tracking into an internal `_turn` dictionary with accessors for `current_index`, `turn_number`, and `running`  
+- Removed the `too-many-instance-attributes` suppression by consolidating turn-related state  
+- Updated `advance_turn()` and `_check_bankruptcy()` to work directly with `_turn` internals to keep attribute count consistent  
+
+### player.py
+- Grouped jail-related state into an internal `_jail` dictionary with documented accessors  
+- Removed the `too-many-instance-attributes` suppression by consolidating jail state  
+- Updated `go_to_jail()` to modify `_jail` directly for consistency  
+---

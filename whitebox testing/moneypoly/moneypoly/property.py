@@ -1,23 +1,70 @@
 """Property and PropertyGroup classes for the MoneyPoly board game."""
 
+from dataclasses import dataclass
 
-class Property:  # pylint: disable=too-many-instance-attributes
+
+@dataclass(frozen=True)
+class PropertyTerms:
+    """Immutable monetary values used by a property."""
+
+    price: int
+    base_rent: int
+
+
+class Property:
     """Represents a single purchasable property tile on the MoneyPoly board."""
 
     FULL_GROUP_MULTIPLIER = 2
 
-    def __init__(self, name, position, price, base_rent, group=None):  # pylint: disable=too-many-arguments,too-many-positional-arguments
+    def __init__(self, name, position, terms, group=None):
         self.name = name
         self.position = position
-        self.price = price
-        self.base_rent = base_rent
-        self.mortgage_value = price // 2
-        self.owner = None
-        self.is_mortgaged = False
-        self.houses = 0
+        self.terms = terms
+        self.mortgage_value = terms.price // 2
         self.group = group
+        self._state = {"owner": None, "is_mortgaged": False, "houses": 0}
         if group is not None and self not in group.properties:
             group.properties.append(self)
+
+    @property
+    def price(self):
+        """Return this property's purchase price."""
+        return self.terms.price
+
+    @property
+    def base_rent(self):
+        """Return this property's base rent before modifiers."""
+        return self.terms.base_rent
+
+    @property
+    def owner(self):
+        """Return the current owner, or None when unowned."""
+        return self._state["owner"]
+
+    @owner.setter
+    def owner(self, value):
+        """Set the property's owner."""
+        self._state["owner"] = value
+
+    @property
+    def is_mortgaged(self):
+        """Return True when the property is mortgaged."""
+        return self._state["is_mortgaged"]
+
+    @is_mortgaged.setter
+    def is_mortgaged(self, value):
+        """Set mortgage state for the property."""
+        self._state["is_mortgaged"] = value
+
+    @property
+    def houses(self):
+        """Return the number of houses built on this property."""
+        return self._state["houses"]
+
+    @houses.setter
+    def houses(self, value):
+        """Set the number of houses built on this property."""
+        self._state["houses"] = value
 
     def get_rent(self):
         """Return rent owed for landing on this property."""

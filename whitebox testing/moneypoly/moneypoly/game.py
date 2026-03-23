@@ -16,7 +16,7 @@ from moneypoly.cards import CardDeck, CHANCE_CARDS, COMMUNITY_CHEST_CARDS
 from moneypoly import ui
 
 
-class Game:  # pylint: disable=too-many-instance-attributes
+class Game:
     """Manages the full state and flow of a MoneyPoly game session."""
 
     def __init__(self, player_names):
@@ -26,11 +26,39 @@ class Game:  # pylint: disable=too-many-instance-attributes
         self.bank = Bank()
         self.dice = Dice()
         self.players = [Player(name) for name in player_names]
-        self.current_index = 0
-        self.turn_number = 0
-        self.running = True
         self.chance_deck = CardDeck(CHANCE_CARDS)
         self.community_deck = CardDeck(COMMUNITY_CHEST_CARDS)
+        self._turn = {"current_index": 0, "turn_number": 0, "running": True}
+
+    @property
+    def current_index(self):
+        """Return index of the active player in the players list."""
+        return self._turn["current_index"]
+
+    @current_index.setter
+    def current_index(self, value):
+        """Set index of the active player."""
+        self._turn["current_index"] = value
+
+    @property
+    def turn_number(self):
+        """Return total number of turns advanced so far."""
+        return self._turn["turn_number"]
+
+    @turn_number.setter
+    def turn_number(self, value):
+        """Set total number of turns advanced so far."""
+        self._turn["turn_number"] = value
+
+    @property
+    def running(self):
+        """Return True while the game loop should continue running."""
+        return self._turn["running"]
+
+    @running.setter
+    def running(self, value):
+        """Set whether the game loop should continue running."""
+        self._turn["running"] = value
 
     def current_player(self):
         """Return the Player whose turn it currently is."""
@@ -38,8 +66,8 @@ class Game:  # pylint: disable=too-many-instance-attributes
 
     def advance_turn(self):
         """Move to the next player in the rotation."""
-        self.current_index = (self.current_index + 1) % len(self.players)
-        self.turn_number += 1
+        self._turn["current_index"] = (self._turn["current_index"] + 1) % len(self.players)
+        self._turn["turn_number"] += 1
 
     def play_turn(self):
         """Execute one complete turn for the current player."""
@@ -346,7 +374,7 @@ class Game:  # pylint: disable=too-many-instance-attributes
             if player in self.players:
                 self.players.remove(player)
             if self.current_index >= len(self.players):
-                self.current_index = 0
+                self._turn["current_index"] = 0
 
     def find_winner(self):
         """Return the player with the highest net worth."""

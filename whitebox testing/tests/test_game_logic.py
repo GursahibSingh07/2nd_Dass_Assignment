@@ -5,7 +5,7 @@ import pytest
 from moneypoly.config import GO_SALARY, INCOME_TAX_AMOUNT, JAIL_FINE, LUXURY_TAX_AMOUNT
 from moneypoly.game import Game
 from moneypoly.player import Player
-from moneypoly.property import Property
+from moneypoly.property import Property, PropertyTerms
 
 
 class DiceStub:
@@ -105,7 +105,7 @@ def test_move_and_resolve_go_to_jail(game_two_players, monkeypatch):
 def test_handle_property_tile_buy_auction_skip(game_two_players, monkeypatch):
     g = game_two_players
     p = g.current_player()
-    prop = Property("X", 1, 60, 2)
+    prop = Property("X", 1, PropertyTerms(60, 2))
 
     calls = {"buy": 0, "auction": 0}
     monkeypatch.setattr(g, "buy_property", lambda player, item: calls.__setitem__("buy", calls["buy"] + 1))
@@ -127,7 +127,7 @@ def test_handle_property_tile_buy_auction_skip(game_two_players, monkeypatch):
 def test_buy_property_success_and_failure(game_two_players):
     g = game_two_players
     p = g.current_player()
-    prop = Property("Y", 3, 100, 10)
+    prop = Property("Y", 3, PropertyTerms(100, 10))
 
     p.balance = 90
     assert g.buy_property(p, prop) is False
@@ -141,7 +141,7 @@ def test_buy_property_success_and_failure(game_two_players):
 def test_buy_property_allows_exact_balance(game_two_players):
     g = game_two_players
     p = g.current_player()
-    prop = Property("Exact", 12, 200, 16)
+    prop = Property("Exact", 12, PropertyTerms(200, 16))
 
     p.balance = prop.price
     assert g.buy_property(p, prop) is True
@@ -152,7 +152,7 @@ def test_pay_rent_paths(game_two_players):
     g = game_two_players
     payer = g.players[0]
     owner = g.players[1]
-    prop = Property("Z", 6, 120, 8)
+    prop = Property("Z", 6, PropertyTerms(120, 8))
 
     prop.owner = owner
     prop.is_mortgaged = True
@@ -174,7 +174,7 @@ def test_mortgage_and_unmortgage_paths(game_two_players):
     g = game_two_players
     p = g.current_player()
     other = g.players[1]
-    prop = Property("M", 8, 200, 20)
+    prop = Property("M", 8, PropertyTerms(200, 20))
 
     prop.owner = other
     assert g.mortgage_property(p, prop) is False
@@ -199,7 +199,7 @@ def test_mortgage_and_unmortgage_paths(game_two_players):
 def test_trade_paths(game_two_players):
     g = game_two_players
     seller, buyer = g.players
-    prop = Property("T", 9, 220, 18)
+    prop = Property("T", 9, PropertyTerms(220, 18))
 
     assert g.trade(seller, buyer, prop, 50) is False
 
@@ -217,7 +217,7 @@ def test_trade_paths(game_two_players):
 def test_trade_rejects_non_positive_cash_amounts(game_two_players):
     g = game_two_players
     seller, buyer = g.players
-    prop = Property("NoFree", 26, 260, 22)
+    prop = Property("NoFree", 26, PropertyTerms(260, 22))
     prop.owner = seller
     seller.add_property(prop)
 
@@ -228,7 +228,7 @@ def test_trade_rejects_non_positive_cash_amounts(game_two_players):
 
 def test_auction_paths(game_two_players, monkeypatch):
     g = game_two_players
-    prop = Property("Auc", 11, 140, 10)
+    prop = Property("Auc", 11, PropertyTerms(140, 10))
 
     seq = iter([0, 0])
     monkeypatch.setattr("moneypoly.ui.safe_int_input", lambda prompt, default=0: next(seq))
@@ -313,7 +313,7 @@ def test_check_bankruptcy_and_find_winner(game_two_players):
     g = game_two_players
     p1, p2 = g.players
 
-    prop = Property("Owned", 15, 180, 14)
+    prop = Property("Owned", 15, PropertyTerms(180, 14))
     prop.owner = p1
     prop.is_mortgaged = True
     p1.add_property(prop)
@@ -371,7 +371,7 @@ def test_interactive_menu_and_submenus(game_two_players, monkeypatch):
     monkeypatch.setattr("moneypoly.ui.safe_int_input", lambda prompt, default=0: next(seq))
     g._menu_trade(player)
 
-    prop = Property("Tradeable", 16, 180, 14)
+    prop = Property("Tradeable", 16, PropertyTerms(180, 14))
     prop.owner = player
     player.properties = [prop]
 
@@ -387,7 +387,7 @@ def test_menu_mortgage_and_unmortgage_edges(game_two_players, monkeypatch):
     g._menu_mortgage(p)
     g._menu_unmortgage(p)
 
-    prop = Property("Menu", 19, 200, 16)
+    prop = Property("Menu", 19, PropertyTerms(200, 16))
     prop.owner = p
     p.properties = [prop]
 

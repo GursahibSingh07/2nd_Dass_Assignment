@@ -2,7 +2,8 @@
 
 from moneypoly.config import STARTING_BALANCE, BOARD_SIZE, GO_SALARY, JAIL_POSITION
 
-class Player:  # pylint: disable=too-many-instance-attributes
+
+class Player:
     """Represents a single player in a MoneyPoly game."""
 
     def __init__(self, name, balance=STARTING_BALANCE):
@@ -10,10 +11,38 @@ class Player:  # pylint: disable=too-many-instance-attributes
         self.balance = balance
         self.position = 0
         self.properties = []
-        self.in_jail = False
-        self.jail_turns = 0
-        self.get_out_of_jail_cards = 0
         self.is_eliminated = False
+        self._jail = {"in_jail": False, "turns": 0, "cards": 0}
+
+    @property
+    def in_jail(self):
+        """Return True when the player is currently in jail."""
+        return self._jail["in_jail"]
+
+    @in_jail.setter
+    def in_jail(self, value):
+        """Set jail status for the player."""
+        self._jail["in_jail"] = value
+
+    @property
+    def jail_turns(self):
+        """Return number of consecutive turns spent in jail."""
+        return self._jail["turns"]
+
+    @jail_turns.setter
+    def jail_turns(self, value):
+        """Set number of turns spent in jail."""
+        self._jail["turns"] = value
+
+    @property
+    def get_out_of_jail_cards(self):
+        """Return number of held Get Out of Jail Free cards."""
+        return self._jail["cards"]
+
+    @get_out_of_jail_cards.setter
+    def get_out_of_jail_cards(self, value):
+        """Set number of held Get Out of Jail Free cards."""
+        self._jail["cards"] = value
 
     def add_money(self, amount):
         """Add funds to this player's balance. Amount must be non-negative."""
@@ -53,8 +82,8 @@ class Player:  # pylint: disable=too-many-instance-attributes
     def go_to_jail(self):
         """Send this player directly to the Jail square."""
         self.position = JAIL_POSITION
-        self.in_jail = True
-        self.jail_turns = 0
+        self._jail["in_jail"] = True
+        self._jail["turns"] = 0
 
     def add_property(self, prop):
         """Add a property tile to this player's holdings."""
