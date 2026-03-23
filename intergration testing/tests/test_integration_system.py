@@ -1,13 +1,13 @@
 import pytest
 
-from streetrace_manager.crew_management import CrewManagementModule
-from streetrace_manager.inventory import InventoryError, InventoryModule
-from streetrace_manager.leaderboard import LeaderboardError, LeaderboardModule
-from streetrace_manager.mission_planning import MissionPlanningError, MissionPlanningModule
-from streetrace_manager.race_management import RaceManagementError, RaceManagementModule
-from streetrace_manager.registration import RegistrationModule
-from streetrace_manager.results import ResultsError, ResultsModule
-from streetrace_manager.vehicle_maintenance import VehicleMaintenanceError, VehicleMaintenanceModule
+from Code.crew_management import CrewManagementModule
+from Code.inventory import InventoryError, InventoryModule
+from Code.leaderboard import LeaderboardError, LeaderboardModule
+from Code.mission_planning import MissionPlanningError, MissionPlanningModule
+from Code.race_management import RaceManagementError, RaceManagementModule
+from Code.registration import RegistrationModule
+from Code.results import ResultsError, ResultsModule
+from Code.vehicle_maintenance import VehicleMaintenanceError, VehicleMaintenanceModule
 
 
 def _build_system() -> tuple[

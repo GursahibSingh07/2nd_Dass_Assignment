@@ -1,9 +1,9 @@
 import pytest
 
-from moneypoly.bank import Bank
 from moneypoly.board import Board
 from moneypoly.cards import CardDeck
 from moneypoly.dice import Dice
+from moneypoly.bank import Bank
 from moneypoly.player import Player
 from moneypoly.property import Property, PropertyGroup, PropertyTerms
 
